@@ -3,34 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบวางแผนตารางงานรายสัปดาห์ & รายเดือน</title>
+    <title>ระบบวางแผนตารางงาน Pro Planner V3</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --header-bg: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            --cell-hover: #f0f9ff;
+            --input-bg: #ffffff;
+            --table-header: #f8fafc;
         }
 
+        body.dark-mode {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-bg: rgba(30, 41, 59, 0.95);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --header-bg: linear-gradient(135deg, #312e81 0%, #4c1d95 100%);
+            --cell-hover: #1e293b;
+            --input-bg: #0f172a;
+            --table-header: #1e293b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            font-family: 'Sarabun', sans-serif;
+            background: var(--bg-gradient);
             min-height: 100vh;
             padding: 20px;
-            color: #1e293b;
+            color: var(--text-main);
+            transition: all 0.3s ease;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1450px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
             border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
+        /* Header */
         .header {
-            background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+            background: var(--header-bg);
             color: white;
             padding: 25px 30px;
             display: flex;
@@ -40,43 +64,43 @@
             gap: 15px;
         }
 
-        .header-title h1 {
-            font-size: 2em;
-            font-weight: 700;
-        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .header-title h1 { font-size: 1.8em; font-weight: 700; }
+        .header-title p { opacity: 0.85; font-size: 0.9em; }
 
-        .header-title p {
-            opacity: 0.85;
-            font-size: 0.95em;
-        }
-
-        .stats-bar {
-            display: flex;
-            gap: 15px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 10px 18px;
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 14px;
             border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background 0.2s;
+        }
+        .theme-toggle-btn:hover { background: rgba(255, 255, 255, 0.3); }
+
+        .stats-bar { display: flex; gap: 12px; flex-wrap: wrap; }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.12);
+            padding: 10px 16px;
+            border-radius: 14px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            min-width: 90px;
         }
+        .stat-card .num { font-size: 1.3em; font-weight: bold; }
+        .stat-card .label { font-size: 0.75em; opacity: 0.85; }
 
-        .stat-card .num {
-            font-size: 1.4em;
-            font-weight: bold;
-        }
+        .progress-wrapper { width: 100%; margin-top: 8px; }
+        .progress-bar-bg { background: rgba(255,255,255,0.2); height: 6px; border-radius: 10px; overflow: hidden; }
+        .progress-bar-fill { background: #10b981; height: 100%; width: 0%; transition: width 0.4s ease; }
 
-        .stat-card .label {
-            font-size: 0.8em;
-            opacity: 0.9;
-        }
-
+        /* Controls Bar */
         .controls {
             padding: 18px 30px;
-            background: #f8fafc;
-            border-bottom: 1px solid #e2e8f0;
+            background: rgba(0,0,0,0.02);
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
@@ -84,35 +108,31 @@
             justify-content: space-between;
         }
 
-        .control-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+        .control-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
         .view-switcher {
             display: flex;
-            background: #e2e8f0;
-            padding: 4px;
-            border-radius: 10px;
+            background: var(--border-color);
+            padding: 3px;
+            border-radius: 12px;
         }
 
         .view-btn {
             padding: 8px 16px;
             border: none;
-            border-radius: 8px;
+            border-radius: 9px;
             font-weight: 600;
             cursor: pointer;
             background: transparent;
             transition: all 0.2s;
-            color: #64748b;
+            color: var(--text-muted);
+            font-size: 0.9em;
         }
 
         .view-btn.active {
-            background: white;
-            color: #4f46e5;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            background: var(--card-bg);
+            color: #6366f1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .btn {
@@ -126,156 +146,124 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            font-family: inherit;
         }
 
         .btn-primary { background: #4f46e5; color: white; }
         .btn-primary:hover { background: #4338ca; }
-        
         .btn-danger { background: #ef4444; color: white; }
         .btn-danger:hover { background: #dc2626; }
-        
         .btn-secondary { background: #0284c7; color: white; }
         .btn-secondary:hover { background: #0369a1; }
+        .btn-outline { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-main); }
+        .btn-outline:hover { background: var(--border-color); }
 
-        .btn-outline { background: white; border: 1px solid #cbd5e1; color: #334155; }
-        .btn-outline:hover { background: #f1f5f9; }
-
-        input[type="month"], select {
+        input, select, textarea {
             padding: 8px 12px;
-            border: 1px solid #cbd5e1;
+            border: 1px solid var(--border-color);
             border-radius: 10px;
             font-size: 14px;
             outline: none;
-            background: white;
+            background: var(--input-bg);
+            color: var(--text-main);
+            font-family: inherit;
         }
 
-        /* Table & Calendar Views */
-        .view-container {
-            padding: 20px;
-            overflow-x: auto;
-        }
-
+        /* View Container */
+        .view-container { padding: 20px; overflow-x: auto; }
         .table-scroll-wrapper {
             max-height: 65vh;
             overflow-y: auto;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 900px;
-            background: white;
-        }
-
-        th, td {
-            border: 1px solid #e2e8f0;
-            padding: 10px;
-            text-align: center;
-            vertical-align: top;
-        }
-
-        th {
-            background: #f1f5f9;
-            color: #334155;
-            font-weight: 700;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
+        table { width: 100%; border-collapse: collapse; min-width: 950px; background: var(--card-bg); }
+        th, td { border: 1px solid var(--border-color); padding: 8px; text-align: center; vertical-align: top; }
+        th { background: var(--table-header); color: var(--text-main); font-weight: 700; position: sticky; top: 0; z-index: 10; }
 
         .time-col {
-            background: #f8fafc;
+            background: var(--table-header);
             font-weight: 600;
-            width: 110px;
-            color: #64748b;
-            font-size: 0.85em;
+            width: 100px;
+            color: var(--text-muted);
+            font-size: 0.8em;
             position: sticky;
             left: 0;
             z-index: 5;
         }
 
-        .task-cell {
-            min-height: 60px;
-            height: 60px;
-            cursor: pointer;
-            transition: background 0.2s;
-            position: relative;
-        }
+        .task-cell { min-height: 65px; height: 65px; cursor: pointer; transition: background 0.2s; position: relative; }
+        .task-cell:hover { background: var(--cell-hover); }
+        .task-cell.drag-over { background: rgba(99, 102, 241, 0.15); border: 2px dashed #6366f1; }
 
-        .task-cell:hover { background: #f0f9ff; }
-        .task-cell.drag-over { background: #e0f2fe; border: 2px dashed #0284c7; }
-
+        /* Task Card Styling */
         .task-item {
-            color: white;
-            padding: 6px 10px;
-            border-radius: 8px;
-            margin: 3px 0;
-            font-size: 0.85em;
+            padding: 8px 10px;
+            border-radius: 10px;
+            margin: 4px 0;
+            font-size: 0.82em;
             position: relative;
             cursor: grab;
             transition: all 0.2s;
             text-align: left;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            border-left: 4px solid #94a3b8;
+            background: var(--input-bg);
+            color: var(--text-main);
         }
 
-        .task-item:hover { transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.15); }
-        .task-item .delete-btn {
-            position: absolute;
-            top: 3px;
-            right: 4px;
-            background: rgba(0,0,0,0.2);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            font-size: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .task-item .delete-btn:hover { background: rgba(239, 68, 68, 0.9); }
+        .task-item:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        
+        /* Category Border Colors */
+        .task-item.cat-work { border-left-color: #3b82f6; }
+        .task-item.cat-study { border-left-color: #8b5cf6; }
+        .task-item.cat-personal { border-left-color: #ec4899; }
+        .task-item.cat-health { border-left-color: #10b981; }
 
-        .priority-high { background: #ef4444; }
-        .priority-medium { background: #f59e0b; }
-        .priority-low { background: #10b981; }
+        .task-item.completed { opacity: 0.6; text-decoration: line-through; background: rgba(0,0,0,0.05); }
+
+        .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .task-title { font-weight: 600; word-break: break-word; flex-grow: 1; padding-right: 5px; }
+
+        .task-check {
+            width: 15px; height: 15px; cursor: pointer; accent-color: #10b981;
+        }
+
+        .task-badge {
+            font-size: 0.7em;
+            padding: 2px 6px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .priority-high { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .priority-medium { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .priority-low { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+        .delete-btn {
+            background: none; border: none; color: var(--text-muted);
+            font-size: 12px; cursor: pointer; padding: 0 2px;
+        }
+        .delete-btn:hover { color: #ef4444; }
 
         /* Monthly View Grid */
-        .monthly-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-            background: #e2e8f0;
-            padding: 8px;
-            border-radius: 12px;
-        }
-
-        .month-day-header {
-            background: #f1f5f9;
-            padding: 10px;
-            text-align: center;
-            font-weight: bold;
-            color: #475569;
-            border-radius: 6px;
-        }
-
+        .monthly-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .month-day-header { background: var(--table-header); padding: 10px; text-align: center; font-weight: bold; color: var(--text-muted); border-radius: 8px; }
         .month-day-cell {
-            background: white;
-            min-height: 100px;
-            border-radius: 8px;
+            background: var(--input-bg);
+            min-height: 110px;
+            border-radius: 12px;
             padding: 8px;
             cursor: pointer;
+            border: 1px solid var(--border-color);
             transition: background 0.2s;
-            display: flex;
-            flex-direction: column;
         }
-
-        .month-day-cell:hover { background: #f8fafc; }
-        .month-day-cell.other-month { opacity: 0.4; background: #f1f5f9; }
-        .month-day-number { font-weight: bold; margin-bottom: 5px; color: #334155; }
+        .month-day-cell:hover { background: var(--cell-hover); }
+        .month-day-cell.other-month { opacity: 0.35; }
+        .month-day-number { font-weight: bold; margin-bottom: 6px; font-size: 0.9em; }
 
         /* Modal */
         .modal {
@@ -283,43 +271,40 @@
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(5px);
             justify-content: center; align-items: center;
             z-index: 1000;
         }
-
         .modal-content {
-            background: white;
+            background: var(--card-bg);
+            color: var(--text-main);
             padding: 28px;
             border-radius: 20px;
             width: 90%;
             max-width: 480px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
         }
-
-        .modal-content h2 { margin-bottom: 18px; color: #1e293b; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #475569; font-size: 0.9em; }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px;
-        }
-        .form-group textarea { height: 80px; resize: vertical; }
-
+        .modal-content h2 { margin-bottom: 18px; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.85em; color: var(--text-muted); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; }
         .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
 
         .notification {
             position: fixed; top: 20px; right: 20px;
             background: #10b981; color: white;
-            padding: 12px 20px; border-radius: 10px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 12px 20px; border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
             transform: translateX(400px); transition: transform 0.3s; z-index: 2000;
+            font-weight: 600;
         }
         .notification.show { transform: translateX(0); }
 
         @media print {
-            body { background: white; padding: 0; }
-            .controls, .btn, .delete-btn, .stats-bar { display: none !important; }
-            .container { box-shadow: none; }
+            body { background: white; padding: 0; color: black; }
+            .controls, .btn, .delete-btn, .theme-toggle-btn, .stats-bar { display: none !important; }
+            .container { box-shadow: none; border: none; }
             .table-scroll-wrapper { max-height: none; overflow: visible; }
         }
     </style>
@@ -328,18 +313,33 @@
     <div class="container">
         <!-- Header Dashboard -->
         <div class="header">
-            <div class="header-title">
-                <h1>📅 ระบบตารางงานรายสัปดาห์ & รายเดือน</h1>
-                <p>จัดการเวลา ประชุม และภารกิจได้ครบถ้วนตลอด 24 ชั่วโมง</p>
-            </div>
-            <div class="stats-bar">
-                <div class="stat-card">
-                    <div class="num" id="totalTasksCount">0</div>
-                    <div class="label">งานทั้งหมด</div>
+            <div class="header-left">
+                <button class="theme-toggle-btn" onclick="toggleDarkMode()" title="สลับโหมด มืด/สว่าง">🌙</button>
+                <div class="header-title">
+                    <h1>📅 Pro Planner V3</h1>
+                    <p>ระบบวางแผนและบริหารเวลาแบบครบวงจร 24 ชั่วโมง</p>
                 </div>
-                <div class="stat-card">
-                    <div class="num" id="highPriorityCount">0</div>
-                    <div class="label">งานด่วนสูง</div>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stats-bar">
+                    <div class="stat-card">
+                        <div class="num" id="totalTasksCount">0</div>
+                        <div class="label">งานทั้งหมด</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="num" id="completedTasksCount">0</div>
+                        <div class="label">เสร็จแล้ว</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="num" id="highPriorityCount">0</div>
+                        <div class="label">ด่วนสูง</div>
+                    </div>
+                </div>
+                <div class="progress-wrapper">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progressBarFill"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -354,10 +354,22 @@
                 <input type="month" id="monthPicker" onchange="onMonthChange()">
             </div>
 
+            <!-- Search & Filter Bar -->
             <div class="control-group">
-                <button class="btn btn-primary" onclick="openModal()">➕ เพิ่มงานใหม่</button>
-                <button class="btn btn-outline" onclick="exportData()">📥 ส่งออก JSON</button>
-                <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">📤 นำเข้า JSON</button>
+                <input type="text" id="searchInput" placeholder="🔍 ค้นหางาน..." oninput="render()">
+                <select id="categoryFilter" onchange="render()">
+                    <option value="all">📁 หมวดหมู่ทั้งหมด</option>
+                    <option value="work">💼 งาน/ธุรกิจ</option>
+                    <option value="study">📚 การเรียน</option>
+                    <option value="personal">🏠 ส่วนตัว</option>
+                    <option value="health">🏋️ สุขภาพ</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <button class="btn btn-primary" onclick="openModal()">➕ เพิ่มงาน</button>
+                <button class="btn btn-outline" onclick="exportData()">📥 ส่งออก</button>
+                <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">📤 นำเข้า</button>
                 <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
                 <button class="btn btn-secondary" onclick="window.print()">🖨️ พิมพ์</button>
                 <button class="btn btn-danger" onclick="clearAll()">🗑️ ล้างข้อมูล</button>
@@ -394,13 +406,13 @@
         </div>
     </div>
 
-    <!-- Modal เพิ่ม/แก้ไขงาน -->
+    <!-- Modal เพิ่มงาน -->
     <div id="taskModal" class="modal">
         <div class="modal-content">
             <h2>➕ เพิ่มงานใหม่</h2>
             <div class="form-group">
-                <label>ชื่องาน:</label>
-                <input type="text" id="taskName" placeholder="เช่น ประชุมวางแผนประจำสัปดาห์">
+                <label>ชื่องาน / กิจกรรม:</label>
+                <input type="text" id="taskName" placeholder="เช่น ประชุมสรุปงานประจำสัปดาห์">
             </div>
             <div class="form-group">
                 <label>วันที่:</label>
@@ -411,16 +423,25 @@
                 <select id="taskTime"></select>
             </div>
             <div class="form-group">
+                <label>หมวดหมู่:</label>
+                <select id="taskCategory">
+                    <option value="work">💼 งาน/ธุรกิจ</option>
+                    <option value="study">📚 การเรียน</option>
+                    <option value="personal">🏠 ส่วนตัว</option>
+                    <option value="health">🏋️ สุขภาพ</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label>ระดับความสำคัญ:</label>
                 <select id="taskPriority">
-                    <option value="low">ต่ำ (สีเขียว)</option>
+                    <option value="low">ปกติ (สีเขียว)</option>
                     <option value="medium">ปานกลาง (สีส้ม)</option>
-                    <option value="high">สูง (สีแดง)</option>
+                    <option value="high">สูง/ด่วน (สีแดง)</option>
                 </select>
             </div>
             <div class="form-group">
                 <label>รายละเอียดเพิ่มเติม:</label>
-                <textarea id="taskDescription" placeholder="โน้ตเพิ่มเติม..."></textarea>
+                <textarea id="taskDescription" placeholder="ใส่โน้ตหรือรายละเอียดเพิ่มเติม..."></textarea>
             </div>
             <div class="modal-buttons">
                 <button class="btn btn-outline" onclick="closeModal()">ยกเลิก</button>
@@ -433,15 +454,22 @@
 
     <script>
         let currentView = 'weekly';
-        let selectedDate = new Date(); // วันที่อ้างอิงปัจจุบัน
-        let tasks = JSON.parse(localStorage.getItem('appScheduleTasks')) || [];
+        let selectedDate = new Date();
+        let tasks = JSON.parse(localStorage.getItem('appScheduleTasksV3')) || [];
+        let isDarkMode = localStorage.getItem('appDarkMode') === 'true';
 
-        // เริ่มต้นโหลดแอพ
         window.onload = () => {
+            if (isDarkMode) document.body.classList.add('dark-mode');
             initMonthPicker();
             populateTimeSelect();
             render();
         };
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            localStorage.setItem('appDarkMode', isDarkMode);
+        }
 
         function initMonthPicker() {
             const year = selectedDate.getFullYear();
@@ -479,6 +507,17 @@
             }
         }
 
+        function getFilteredTasks() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+
+            return tasks.filter(t => {
+                const matchesSearch = t.name.toLowerCase().includes(searchQuery) || (t.description && t.description.toLowerCase().includes(searchQuery));
+                const matchesCat = categoryFilter === 'all' || t.category === categoryFilter;
+                return matchesSearch && matchesCat;
+            });
+        }
+
         function render() {
             updateStats();
             if (currentView === 'weekly') {
@@ -489,17 +528,23 @@
         }
 
         function updateStats() {
-            document.getElementById('totalTasksCount').textContent = tasks.length;
-            const highTasks = tasks.filter(t => t.priority === 'high').length;
-            document.getElementById('highPriorityCount').textContent = highTasks;
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.completed).length;
+            const high = tasks.filter(t => t.priority === 'high' && !t.completed).length;
+            
+            document.getElementById('totalTasksCount').textContent = total;
+            document.getElementById('completedTasksCount').textContent = completed;
+            document.getElementById('highPriorityCount').textContent = high;
+
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            document.getElementById('progressBarFill').style.width = `${percentage}%`;
         }
 
-        // ==================== WEEKLY VIEW (24h) ====================
+        // ==================== WEEKLY VIEW ====================
         function renderWeeklyView() {
             const tbody = document.getElementById('weeklyTableBody');
             tbody.innerHTML = '';
 
-            // คำนวณหาวันจันทร์ของสัปดาห์ที่เลือก
             const startOfWeek = getMonday(new Date(selectedDate));
             const weekDates = [];
             for (let i = 0; i < 7; i++) {
@@ -508,7 +553,6 @@
                 weekDates.push(d);
             }
 
-            // อัปเดตหัวตารางแสดงวันและวันที่
             const dayNames = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์', 'อาทิตย์'];
             const headerRow = document.getElementById('weeklyTableHeader');
             headerRow.innerHTML = '<th class="time-col">เวลา</th>';
@@ -517,7 +561,8 @@
                 headerRow.innerHTML += `<th>${dayNames[idx]}<br><span style="font-size:0.8em; font-weight:normal">${dateStr}</span></th>`;
             });
 
-            // สร้าง 24 แถบเวลา
+            const filteredTasks = getFilteredTasks();
+
             for (let hour = 0; hour < 24; hour++) {
                 const tr = document.createElement('tr');
                 
@@ -533,7 +578,6 @@
                     td.dataset.date = cellDateStr;
                     td.dataset.hour = hour;
 
-                    // Drag & Drop
                     td.ondragover = (e) => { e.preventDefault(); td.classList.add('drag-over'); };
                     td.ondragleave = () => td.classList.remove('drag-over');
                     td.ondrop = (e) => handleDrop(e, cellDateStr, hour);
@@ -542,8 +586,7 @@
                         if (e.target === td) openModalWithPreset(cellDateStr, hour);
                     };
 
-                    // งานที่ตรงกับวันและเวลานี้
-                    const cellTasks = tasks.filter(t => t.date === cellDateStr && parseInt(t.hour) === hour);
+                    const cellTasks = filteredTasks.filter(t => t.date === cellDateStr && parseInt(t.hour) === hour);
                     cellTasks.forEach(task => {
                         td.appendChild(createTaskCard(task));
                     });
@@ -570,19 +613,19 @@
             const firstDay = new Date(year, month, 1);
             const lastDay = new Date(year, month + 1, 0);
 
-            const startDayIdx = firstDay.getDay(); // 0 = Sunday
+            const startDayIdx = firstDay.getDay();
             const totalDays = lastDay.getDate();
 
-            // ช่องว่างของเดือนก่อนหน้า
+            const filteredTasks = getFilteredTasks();
+
             for (let i = 0; i < startDayIdx; i++) {
                 grid.innerHTML += `<div class="month-day-cell other-month"></div>`;
             }
 
-            // วันในเดือนปัจจุบัน
             for (let day = 1; day <= totalDays; day++) {
                 const cellDate = new Date(year, month, day);
                 const dateKey = formatDateKey(cellDate);
-                const dayTasks = tasks.filter(t => t.date === dateKey);
+                const dayTasks = filteredTasks.filter(t => t.date === dateKey);
 
                 const cellDiv = document.createElement('div');
                 cellDiv.className = 'month-day-cell';
@@ -602,28 +645,44 @@
             }
         }
 
-        // ==================== HELPERS ====================
+        // ==================== HELPERS & ACTIONS ====================
         function createTaskCard(task) {
             const div = document.createElement('div');
-            div.className = `task-item priority-${task.priority}`;
-            div.textContent = task.name;
-            div.title = `เวลา: ${String(task.hour).padStart(2,'0')}:00 น.\nรายละเอียด: ${task.description || '-'}`;
+            const catClass = `cat-${task.category || 'work'}`;
+            const compClass = task.completed ? 'completed' : '';
+            div.className = `task-item ${catClass} ${compClass}`;
             div.draggable = true;
+
+            const priorityText = task.priority === 'high' ? 'ด่วน' : (task.priority === 'medium' ? 'ปานกลาง' : 'ปกติ');
+
+            div.innerHTML = `
+                <div class="task-header">
+                    <input type="checkbox" class="task-check" ${task.completed ? 'checked' : ''} onclick="toggleTaskComplete(event, ${task.id})">
+                    <span class="task-title">${escapeHtml(task.name)}</span>
+                    <button class="delete-btn" onclick="deleteTask(event, ${task.id})">✕</button>
+                </div>
+                <div>
+                    <span class="task-badge priority-${task.priority}">${priorityText}</span>
+                </div>
+            `;
+
+            div.title = `เวลา: ${String(task.hour).padStart(2,'0')}:00 น.\nรายละเอียด: ${task.description || '-'}`;
 
             div.ondragstart = (e) => {
                 e.dataTransfer.setData('text/plain', JSON.stringify({ taskId: task.id }));
             };
 
-            const delBtn = document.createElement('button');
-            delBtn.className = 'delete-btn';
-            delBtn.textContent = '×';
-            delBtn.onclick = (e) => {
-                e.stopPropagation();
-                deleteTask(task.id);
-            };
-
-            div.appendChild(delBtn);
             return div;
+        }
+
+        function toggleTaskComplete(e, taskId) {
+            e.stopPropagation();
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks();
+                render();
+            }
         }
 
         function handleDrop(e, targetDateStr, targetHour) {
@@ -639,7 +698,7 @@
                 task.hour = parseInt(targetHour);
                 saveTasks();
                 render();
-                showNotification('ย้ายงานเรียบร้อยแล้ว');
+                showNotification('ย้ายเวลาเรียบร้อย');
             }
         }
 
@@ -666,6 +725,7 @@
             const name = document.getElementById('taskName').value.trim();
             const date = document.getElementById('taskDate').value;
             const hour = parseInt(document.getElementById('taskTime').value);
+            const category = document.getElementById('taskCategory').value;
             const priority = document.getElementById('taskPriority').value;
             const description = document.getElementById('taskDescription').value.trim();
 
@@ -676,40 +736,41 @@
 
             tasks.push({
                 id: Date.now(),
-                name, date, hour, priority, description
+                name, date, hour, category, priority, description, completed: false
             });
 
             saveTasks();
             render();
             closeModal();
-            showNotification('บันทึกงานเรียบร้อยแล้ว');
+            showNotification('บันทึกงานเรียบร้อย');
         }
 
-        function deleteTask(taskId) {
+        function deleteTask(e, taskId) {
+            e.stopPropagation();
             tasks = tasks.filter(t => t.id !== taskId);
             saveTasks();
             render();
-            showNotification('ลบงานเรียบร้อยแล้ว');
+            showNotification('ลบงานเรียบร้อย');
         }
 
         function clearAll() {
-            if (confirm('คุณแน่ใจหรือไม่ที่จะล้างงานทั้งหมดในระบบ?')) {
+            if (confirm('ยืนยันที่จะล้างข้อมูลงานทั้งหมด?')) {
                 tasks = [];
                 saveTasks();
                 render();
-                showNotification('ล้างข้อมูลเรียบร้อยแล้ว');
+                showNotification('ล้างข้อมูลเรียบร้อย');
             }
         }
 
         function saveTasks() {
-            localStorage.setItem('appScheduleTasks', JSON.stringify(tasks));
+            localStorage.setItem('appScheduleTasksV3', JSON.stringify(tasks));
         }
 
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(tasks, null, 2));
             const dlAnchor = document.createElement('a');
             dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", `schedule-backup-${formatDateKey(new Date())}.json`);
+            dlAnchor.setAttribute("download", `planner-v3-backup-${formatDateKey(new Date())}.json`);
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
             dlAnchor.remove();
@@ -726,7 +787,7 @@
                         tasks = imported;
                         saveTasks();
                         render();
-                        showNotification('นำเข้าข้อมูลสำเร็จแล้ว');
+                        showNotification('นำเข้าข้อมูลสำเร็จ');
                     }
                 } catch (err) {
                     showNotification('ไฟล์ไม่ถูกต้อง', 'error');
@@ -747,6 +808,10 @@
             const month = String(d.getMonth() + 1).padStart(2, '0');
             const day = String(d.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
         function showNotification(msg, type = 'success') {
